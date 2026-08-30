@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMTAC Data Entry Helper</title>
+    <style>
+        /* 基础与分栏布局 */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .form-panel {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .output-panel {
+            flex: 1;
+            background: #111827;
+            color: #10b981;
+            padding: 25px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 表单样式 */
+        .section-title {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #374151;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea { resize: vertical; height: 60px; }
+        
+        /* 预览区与按钮 */
+        pre {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin: 0;
+        }
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover { background: #059669; }
+    </style>
+</head>
+<body>
+
+    <!-- 左侧：数据输入表单 -->
+    <div class="form-panel">
+        <h2 style="margin-top: 0;">TMTAC Data Entry Helper</h2>
+        
+        <div class="section-title">1. PATIENT INFO & DIAGNOSIS</div>
+        <div class="form-group">
+            <label>Visit Date</label>
+            <input type="date" id="visitDate">
+        </div>
+        <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="e.g. 55">
+        </div>
+        <div class="form-group">
+            <label>Diagnosis</label>
+            <select id="diagnosis">
+                <option value="HB E Beta Thalassaemia">HB E Beta Thalassaemia</option>
+                <option value="Beta Thalassaemia Major">Beta Thalassaemia Major</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Transfusional Types</label>
+            <select id="transfusionType">
+                <option value="Transfusional Dependant Thalassaemia (TDT)">TDT</option>
+                <option value="Non-Transfusional Dependant (NTDT)">NTDT</option>
+            </select>
+        </div>
+
+        <div class="section-title">2. LAB INVESTIGATIONS</div>
+        <div class="form-group">
+            <label>Serum Ferritin (ng/mL)</label>
+            <input type="text" id="ferritin" placeholder="e.g. 1511.6">
+        </div>
+        <div class="form-group">
+            <label>MRI T2* Cardiac (>20ms)</label>
+            <input type="text" id="mriCardiac" placeholder="e.g. 45.7">
+        </div>
+        <div class="form-group">
+            <label>MRI T2* Liver (<7mg/g)</label>
+            <input type="text" id="mriLiver" placeholder="e.g. 19.1">
+        </div>
+
+        <div class="section-title">3. IRON CHELATION THERAPY</div>
+        <div class="form-group">
+            <label>Deferiprone Administered Dose</label>
+            <input type="text" id="deferiproneDose" placeholder="e.g. 2g BD">
+        </div>
+        <div class="form-group">
+            <label>Deferasirox Administered Dose</label>
+            <input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD">
+        </div>
+        <div class="form-group">
+            <label>Missed Doses / Compliance</label>
+            <input type="text" id="compliance" value="Claimed compliant, no miss dose">
+        </div>
+
+        <div class="section-title">4. PHARMACIST PLAN</div>
+        <div class="form-group">
+            <label>Other Issues (Patient well? Symptoms?)</label>
+            <textarea id="otherIssues">Pt well, asymptomatic. Claimed compliance to the meds.</textarea>
+        </div>
+        <div class="form-group">
+            <label>Plan</label>
+            <textarea id="plan">Suggest to continue all medications. To reassess medication compliance.</textarea>
+        </div>
+    </div>
+
+    <!-- 右侧：实时记录预览 -->
+    <div class="output-panel">
+        <pre id="clinicalNote"></pre>
+        <button class="copy-btn" onclick="copyNote()">Copy Clinical Note for PhIS</button>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('input, select, textarea');
+        const noteDisplay = document.getElementById('clinicalNote');
+
+        // 设置默认为今天的日期
+        document.getElementById('visitDate').valueAsDate = new Date();
+
+        function generateNote() {
+            // 获取表单数据
+            const visitDate = document.getElementById('visitDate').value;
+            const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
+            
+            const weight = document.getElementById('weight').value || '-';
+            const diagnosis = document.getElementById('diagnosis').value;
+            const transfusionType = document.getElementById('transfusionType').value;
+            
+            const ferritin = document.getElementById('ferritin').value || '-';
+            const mriCardiac = document.getElementById('mriCardiac').value || '-';
+            const mriLiver = document.getElementById('mriLiver').value || '-';
+            
+            const deferiproneDose = document.getElementById('deferiproneDose').value || 'Nil';
+            const deferasiroxDose = document.getElementById('deferasiroxDose').value || 'Nil';
+            const compliance = document.getElementById('compliance').value || 'Nil';
+            
+            const otherIssues = document.getElementById('otherIssues').value || 'Nil';
+            const plan = document.getElementById('plan').value || 'Nil';
+
+            // 格式化输出文本 (与原版 CSV TMTAC 格式对齐)
+            const noteText = `=== TMTAC PHARMACIST NOTES ===
+Date: ${formattedDate}
+Weight (kg): ${weight}
+Diagnosis: ${diagnosis}
+Transfusional Types: ${transfusionType}
+
+[ LAB INVESTIGATIONS ]
+Serum Ferritin (ng/mL): ${ferritin}
+MRI T2* (Cardiac): ${mriCardiac}
+MRI T2* (Liver): ${mriLiver}
+
+[ OTHER ISSUES ]
+${otherIssues}
+
+[ CHELATION THERAPY ]
+Deferiprone Dose: ${deferiproneDose}
+Deferasirox Dose: ${deferasiroxDose}
+Compliance / Missed Doses: ${compliance}
+
+[ PHARMACIST PLAN ]
+${plan}`;
+
+            noteDisplay.textContent = noteText;
+        }
+
+        // 监听所有输入框，有变动时立即更新右侧文本
+        inputs.forEach(input => {
+            input.addEventListener('input', generateNote);
+            input.addEventListener('change', generateNote);
+        });
+
+        // 复制到剪贴板功能
+        function copyNote() {
+            const textToCopy = noteDisplay.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = "✓ Copied Successfully!";
+                btn.style.background = "#059669";
+                setTimeout(() => { 
+                    btn.textContent = originalText; 
+                    btn.style.background = "#10b981";
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert("Failed to copy. Please manually copy the text.");
+            });
+        }
+
+        // 初始化第一次渲染
+        generateNote();
+    </script>
+</body>
+</html>
