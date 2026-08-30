@@ -16,7 +16,7 @@
             box-sizing: border-box;
         }
         .form-panel {
-            flex: 1.2; /* 表单区稍微宽一点，因为内容多 */
+            flex: 1.2;
             background: white;
             padding: 25px;
             border-radius: 8px;
@@ -101,7 +101,24 @@
             <div class="form-group"><label>Visit Date</label><input type="date" id="visitDate"></div>
             <div class="form-group"><label>Visit Number</label><input type="text" id="visitNumber" placeholder="e.g. 1"></div>
             <div class="form-group"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 55"></div>
-            <div class="form-group"><label>Diagnosis</label><input type="text" id="diagnosis" value="HB E Beta Thalassaemia"></div>
+            
+            <!-- 这里改成了下拉菜单 -->
+            <div class="form-group">
+                <label>Diagnosis</label>
+                <select id="diagnosis">
+                    <option value="Thalassaemia Major">Thalassaemia Major</option>
+                    <option value="HB E Beta Thalassaemia">HB E Beta Thalassaemia</option>
+                    <option value="HB H Constant Spring">HB H Constant Spring</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            
+            <!-- 选择 Others 时显示这个输入框 -->
+            <div class="form-group" id="otherDiagDiv" style="display: none;">
+                <label>If Others, please specify:</label>
+                <input type="text" id="otherDiagnosis" placeholder="Specify diagnosis">
+            </div>
+
             <div class="form-group"><label>Transfusional Types</label><input type="text" id="transfusionType" value="Transfusional Dependant Thalassaemia (TDT)"></div>
             <div class="form-group"><label>Transfusion Frequency</label><input type="text" id="transfusionFreq" value="4 weekly"></div>
         </div>
@@ -165,7 +182,19 @@
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
             const visitNumber = document.getElementById('visitNumber').value || '-';
             const weight = document.getElementById('weight').value || '-';
-            const diagnosis = document.getElementById('diagnosis').value || '-';
+            
+            // 抓取 Diagnosis 逻辑
+            let diagnosis = document.getElementById('diagnosis').value;
+            const otherDiagDiv = document.getElementById('otherDiagDiv');
+            
+            if (diagnosis === 'Others') {
+                otherDiagDiv.style.display = 'block'; // 显示 Others 输入框
+                const otherVal = document.getElementById('otherDiagnosis').value;
+                diagnosis = otherVal ? `Others (${otherVal})` : 'Others';
+            } else {
+                otherDiagDiv.style.display = 'none'; // 隐藏 Others 输入框
+            }
+
             const transfusionType = document.getElementById('transfusionType').value || '-';
             const transfusionFreq = document.getElementById('transfusionFreq').value || '-';
             
