@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Full Version)</title>
+    <title>TMTAC Data Entry Helper (Pro Version)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -102,7 +102,6 @@
             <div class="form-group"><label>Visit Number</label><input type="text" id="visitNumber" placeholder="e.g. 1"></div>
             <div class="form-group"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 55"></div>
             
-            <!-- 这里改成了下拉菜单 -->
             <div class="form-group">
                 <label>Diagnosis</label>
                 <select id="diagnosis">
@@ -113,13 +112,19 @@
                 </select>
             </div>
             
-            <!-- 选择 Others 时显示这个输入框 -->
             <div class="form-group" id="otherDiagDiv" style="display: none;">
                 <label>If Others, please specify:</label>
                 <input type="text" id="otherDiagnosis" placeholder="Specify diagnosis">
             </div>
 
-            <div class="form-group"><label>Transfusional Types</label><input type="text" id="transfusionType" value="Transfusional Dependant Thalassaemia (TDT)"></div>
+            <!-- 新增下拉：输血类型 -->
+            <div class="form-group">
+                <label>Transfusional Types</label>
+                <select id="transfusionType">
+                    <option value="Transfusional Dependant Thalassaemia (TDT)">TDT (Transfusional Dependant)</option>
+                    <option value="Non-Transfusional Dependant (NTDT)">NTDT (Non-Transfusional Dependant)</option>
+                </select>
+            </div>
             <div class="form-group"><label>Transfusion Frequency</label><input type="text" id="transfusionFreq" value="4 weekly"></div>
         </div>
 
@@ -137,20 +142,52 @@
             <div class="form-group"><label>Desferoxamine Issues</label><input type="text" id="desferoxamineIssues" placeholder="Site issues, WFI volume..."></div>
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="e.g. 2g BD"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD"></div>
-            <div class="form-group"><label>Compliance / Missed Doses</label><input type="text" id="compliance" value="Claimed compliant, no miss dose"></div>
+            
+            <!-- 新增下拉：依从性 -->
+            <div class="form-group">
+                <label>Compliance / Missed Doses</label>
+                <select id="compliance">
+                    <option value="Claimed compliant, no miss dose">Claimed compliant, no miss dose</option>
+                    <option value="1-2 missed doses per week">1-2 missed doses per week</option>
+                    <option value=">2 missed doses per week">> 2 missed doses per week</option>
+                    <option value="Non-compliant">Non-compliant</option>
+                </select>
+            </div>
             <div class="form-group"><label>Balance Pill Counts</label><input type="text" id="pillCounts" value="Half bottle Deferiprone, 30's Deferasirox"></div>
         </div>
 
         <div class="section-title">4. ADJUNCT THERAPY & ADVERSE EVENTS</div>
         <div class="grid-2">
-            <div class="form-group"><label>Vitamin C Intake</label><input type="text" id="vitC" placeholder="e.g. Yes / No"></div>
+            <!-- 新增下拉：Vit C -->
+            <div class="form-group">
+                <label>Vitamin C Intake</label>
+                <select id="vitC">
+                    <option value="N/A">N/A</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
             <div class="form-group"><label>Adverse Events</label><input type="text" id="adverseEvents" value="N/A"></div>
         </div>
 
         <div class="section-title">5. LIFESTYLE, VACCINATION & OTHERS</div>
         <div class="grid-2">
-            <div class="form-group"><label>Low-iron diet adherence</label><input type="text" id="diet" value="Yes"></div>
-            <div class="form-group"><label>History of Splenectomy</label><input type="text" id="splenectomy" value="No"></div>
+            <!-- 新增下拉：饮食 -->
+            <div class="form-group">
+                <label>Low-iron diet adherence</label>
+                <select id="diet">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+            <!-- 新增下拉：脾切除 -->
+            <div class="form-group">
+                <label>History of Splenectomy</label>
+                <select id="splenectomy">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
             <div class="form-group"><label>Physical Activity</label><input type="text" id="physicalActivity" value="Working at restaurant, from day to night"></div>
             <div class="form-group"><label>Vaccines (Influenza/Pneumo...)</label><input type="text" id="vaccines" placeholder="e.g. Up to date"></div>
         </div>
@@ -188,14 +225,14 @@
             const otherDiagDiv = document.getElementById('otherDiagDiv');
             
             if (diagnosis === 'Others') {
-                otherDiagDiv.style.display = 'block'; // 显示 Others 输入框
+                otherDiagDiv.style.display = 'block';
                 const otherVal = document.getElementById('otherDiagnosis').value;
                 diagnosis = otherVal ? `Others (${otherVal})` : 'Others';
             } else {
-                otherDiagDiv.style.display = 'none'; // 隐藏 Others 输入框
+                otherDiagDiv.style.display = 'none';
             }
 
-            const transfusionType = document.getElementById('transfusionType').value || '-';
+            const transfusionType = document.getElementById('transfusionType').value;
             const transfusionFreq = document.getElementById('transfusionFreq').value || '-';
             
             // Section 2
@@ -209,14 +246,14 @@
             const desferoxamineIssues = document.getElementById('desferoxamineIssues').value || 'N/A';
             const deferiproneDose = document.getElementById('deferiproneDose').value || 'N/A';
             const deferasiroxDose = document.getElementById('deferasiroxDose').value || 'N/A';
-            const compliance = document.getElementById('compliance').value || '-';
+            const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
 
             // Section 4 & 5
-            const vitC = document.getElementById('vitC').value || 'N/A';
+            const vitC = document.getElementById('vitC').value;
             const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
-            const diet = document.getElementById('diet').value || '-';
-            const splenectomy = document.getElementById('splenectomy').value || '-';
+            const diet = document.getElementById('diet').value;
+            const splenectomy = document.getElementById('splenectomy').value;
             const physicalActivity = document.getElementById('physicalActivity').value || '-';
             const vaccines = document.getElementById('vaccines').value || '-';
 
