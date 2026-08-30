@@ -124,8 +124,8 @@
                 </select>
             </div>
             
-            <!-- 这里改成了下拉菜单 -->
-            <div class="form-group">
+            <!-- 增加了 id="transfusionFreqDiv" 用来控制显示和隐藏 -->
+            <div class="form-group" id="transfusionFreqDiv">
                 <label>Transfusion Frequency</label>
                 <select id="transfusionFreq">
                     <option value="every month">every month</option>
@@ -225,6 +225,7 @@
             const visitNumber = document.getElementById('visitNumber').value || '-';
             const weight = document.getElementById('weight').value || '-';
             
+            // Diagnosis Logic
             let diagnosis = document.getElementById('diagnosis').value;
             const otherDiagDiv = document.getElementById('otherDiagDiv');
             
@@ -236,9 +237,23 @@
                 otherDiagDiv.style.display = 'none';
             }
 
+            // Transfusion Type Logic
             const transfusionType = document.getElementById('transfusionType').value;
-            const transfusionFreq = document.getElementById('transfusionFreq').value || '-';
+            const transfusionFreqDiv = document.getElementById('transfusionFreqDiv');
+            let transfusionFreq = '';
             
+            if (transfusionType === 'Non-Transfusional Dependant (NTDT)') {
+                transfusionFreqDiv.style.display = 'none'; // 隐藏频率选择框
+            } else {
+                transfusionFreqDiv.style.display = 'block'; // 显示频率选择框
+                transfusionFreq = document.getElementById('transfusionFreq').value;
+            }
+            
+            let finalTransfusionText = transfusionType;
+            if (transfusionType !== 'Non-Transfusional Dependant (NTDT)' && transfusionFreq && transfusionFreq !== 'N/A') {
+                finalTransfusionText += ` (${transfusionFreq})`;
+            }
+
             // Section 2
             const ferritin = document.getElementById('ferritin').value || '-';
             const neutrophil = document.getElementById('neutrophil').value || '-';
@@ -253,7 +268,7 @@
             const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
 
-            // 智能生成药物列表 (没填就不显示)
+            // Smart Chelation logic
             let chelationDrugsText = "";
             const isUsed = (val) => val && val.toLowerCase() !== 'nil' && val.toLowerCase() !== 'n/a' && val !== '-';
 
@@ -291,7 +306,7 @@ Date: ${formattedDate}
 Visit Number: ${visitNumber}
 Weight (kg): ${weight}
 Diagnosis: ${diagnosis}
-Transfusional Types: ${transfusionType} (${transfusionFreq})
+Transfusional Types: ${finalTransfusionText}
 
 [ LAB INVESTIGATIONS ]
 Serum Ferritin (ng/mL): ${ferritin}
