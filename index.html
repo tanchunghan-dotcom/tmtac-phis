@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper</title>
+    <title>TMTAC Data Entry Helper (Full Version)</title>
     <style>
-        /* 基础与分栏布局 */
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background-color: #f3f4f6;
@@ -17,7 +16,7 @@
             box-sizing: border-box;
         }
         .form-panel {
-            flex: 1;
+            flex: 1.2; /* 表单区稍微宽一点，因为内容多 */
             background: white;
             padding: 25px;
             border-radius: 8px;
@@ -25,7 +24,7 @@
             overflow-y: auto;
         }
         .output-panel {
-            flex: 1;
+            flex: 0.8;
             background: #111827;
             color: #10b981;
             padding: 25px;
@@ -33,7 +32,6 @@
             display: flex;
             flex-direction: column;
         }
-        /* 表单样式 */
         .section-title {
             color: #2563eb;
             border-bottom: 2px solid #e5e7eb;
@@ -41,6 +39,12 @@
             margin-top: 25px;
             margin-bottom: 15px;
             font-size: 16px;
+            font-weight: bold;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -49,27 +53,27 @@
             display: block;
             font-weight: 600;
             margin-bottom: 5px;
-            font-size: 14px;
+            font-size: 13px;
             color: #374151;
         }
         input, select, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             box-sizing: border-box;
             font-family: inherit;
+            font-size: 13px;
         }
-        textarea { resize: vertical; height: 60px; }
-        
-        /* 预览区与按钮 */
+        textarea { resize: vertical; height: 50px; }
         pre {
             white-space: pre-wrap;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 13px;
             flex-grow: 1;
             overflow-y: auto;
             margin: 0;
+            line-height: 1.4;
         }
         .copy-btn {
             background: #10b981;
@@ -90,137 +94,155 @@
 
     <!-- 左侧：数据输入表单 -->
     <div class="form-panel">
-        <h2 style="margin-top: 0;">TMTAC Data Entry Helper</h2>
+        <h2 style="margin-top: 0; margin-bottom: 5px;">TMTAC Full Entry</h2>
         
         <div class="section-title">1. PATIENT INFO & DIAGNOSIS</div>
-        <div class="form-group">
-            <label>Visit Date</label>
-            <input type="date" id="visitDate">
-        </div>
-        <div class="form-group">
-            <label>Weight (kg)</label>
-            <input type="number" id="weight" placeholder="e.g. 55">
-        </div>
-        <div class="form-group">
-            <label>Diagnosis</label>
-            <select id="diagnosis">
-                <option value="HB E Beta Thalassaemia">HB E Beta Thalassaemia</option>
-                <option value="Beta Thalassaemia Major">Beta Thalassaemia Major</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Transfusional Types</label>
-            <select id="transfusionType">
-                <option value="Transfusional Dependant Thalassaemia (TDT)">TDT</option>
-                <option value="Non-Transfusional Dependant (NTDT)">NTDT</option>
-            </select>
+        <div class="grid-2">
+            <div class="form-group"><label>Visit Date</label><input type="date" id="visitDate"></div>
+            <div class="form-group"><label>Visit Number</label><input type="text" id="visitNumber" placeholder="e.g. 1"></div>
+            <div class="form-group"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 55"></div>
+            <div class="form-group"><label>Diagnosis</label><input type="text" id="diagnosis" value="HB E Beta Thalassaemia"></div>
+            <div class="form-group"><label>Transfusional Types</label><input type="text" id="transfusionType" value="Transfusional Dependant Thalassaemia (TDT)"></div>
+            <div class="form-group"><label>Transfusion Frequency</label><input type="text" id="transfusionFreq" value="4 weekly"></div>
         </div>
 
         <div class="section-title">2. LAB INVESTIGATIONS</div>
-        <div class="form-group">
-            <label>Serum Ferritin (ng/mL)</label>
-            <input type="text" id="ferritin" placeholder="e.g. 1511.6">
-        </div>
-        <div class="form-group">
-            <label>MRI T2* Cardiac (>20ms)</label>
-            <input type="text" id="mriCardiac" placeholder="e.g. 45.7">
-        </div>
-        <div class="form-group">
-            <label>MRI T2* Liver (<7mg/g)</label>
-            <input type="text" id="mriLiver" placeholder="e.g. 19.1">
+        <div class="grid-2">
+            <div class="form-group"><label>Serum Ferritin (ng/mL)</label><input type="text" id="ferritin" placeholder="e.g. 1511.6 (20/1/2026)"></div>
+            <div class="form-group"><label>Neutrophil Count</label><input type="text" id="neutrophil" placeholder="e.g. 2.5"></div>
+            <div class="form-group"><label>MRI T2* Cardiac (>20ms)</label><input type="text" id="mriCardiac" placeholder="e.g. 45.7"></div>
+            <div class="form-group"><label>MRI T2* Liver (<7mg/g)</label><input type="text" id="mriLiver" placeholder="e.g. 19.1"></div>
         </div>
 
-        <div class="section-title">3. IRON CHELATION THERAPY</div>
-        <div class="form-group">
-            <label>Deferiprone Administered Dose</label>
-            <input type="text" id="deferiproneDose" placeholder="e.g. 2g BD">
-        </div>
-        <div class="form-group">
-            <label>Deferasirox Administered Dose</label>
-            <input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD">
-        </div>
-        <div class="form-group">
-            <label>Missed Doses / Compliance</label>
-            <input type="text" id="compliance" value="Claimed compliant, no miss dose">
+        <div class="section-title">3. IRON CHELATION THERAPY & PILL COUNTS</div>
+        <div class="grid-2">
+            <div class="form-group"><label>Desferoxamine Dose</label><input type="text" id="desferoxamine" placeholder="e.g. Nil"></div>
+            <div class="form-group"><label>Desferoxamine Issues</label><input type="text" id="desferoxamineIssues" placeholder="Site issues, WFI volume..."></div>
+            <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="e.g. 2g BD"></div>
+            <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD"></div>
+            <div class="form-group"><label>Compliance / Missed Doses</label><input type="text" id="compliance" value="Claimed compliant, no miss dose"></div>
+            <div class="form-group"><label>Balance Pill Counts</label><input type="text" id="pillCounts" value="Half bottle Deferiprone, 30's Deferasirox"></div>
         </div>
 
-        <div class="section-title">4. PHARMACIST PLAN</div>
-        <div class="form-group">
-            <label>Other Issues (Patient well? Symptoms?)</label>
-            <textarea id="otherIssues">Pt well, asymptomatic. Claimed compliance to the meds.</textarea>
+        <div class="section-title">4. ADJUNCT THERAPY & ADVERSE EVENTS</div>
+        <div class="grid-2">
+            <div class="form-group"><label>Vitamin C Intake</label><input type="text" id="vitC" placeholder="e.g. Yes / No"></div>
+            <div class="form-group"><label>Adverse Events</label><input type="text" id="adverseEvents" value="N/A"></div>
         </div>
-        <div class="form-group">
-            <label>Plan</label>
-            <textarea id="plan">Suggest to continue all medications. To reassess medication compliance.</textarea>
+
+        <div class="section-title">5. LIFESTYLE, VACCINATION & OTHERS</div>
+        <div class="grid-2">
+            <div class="form-group"><label>Low-iron diet adherence</label><input type="text" id="diet" value="Yes"></div>
+            <div class="form-group"><label>History of Splenectomy</label><input type="text" id="splenectomy" value="No"></div>
+            <div class="form-group"><label>Physical Activity</label><input type="text" id="physicalActivity" value="Working at restaurant, from day to night"></div>
+            <div class="form-group"><label>Vaccines (Influenza/Pneumo...)</label><input type="text" id="vaccines" placeholder="e.g. Up to date"></div>
+        </div>
+
+        <div class="section-title">6. PHARMACIST PLAN & TCA</div>
+        <div class="form-group"><label>Other Issues (Patient well? Symptoms?)</label><textarea id="otherIssues">Pt well, asymptomatic. Pt claimed compliance to the meds, no miss dose and has good knowledge on the diet.</textarea></div>
+        <div class="form-group"><label>Pharmacist Plan</label><textarea id="plan">Suggest to continue all medications. To reassess medication compliance. To monitor Serum Ferritin level.</textarea></div>
+        <div class="grid-2">
+            <div class="form-group"><label>TCA TMTAC</label><input type="text" id="tcaTmtac" placeholder="Date/Duration"></div>
+            <div class="form-group"><label>TCA DR</label><input type="text" id="tcaDr" placeholder="Date/Duration"></div>
         </div>
     </div>
 
     <!-- 右侧：实时记录预览 -->
     <div class="output-panel">
         <pre id="clinicalNote"></pre>
-        <button class="copy-btn" onclick="copyNote()">Copy Clinical Note for PhIS</button>
+        <button class="copy-btn" onclick="copyNote()">Copy Clinical Note</button>
     </div>
 
     <script>
         const inputs = document.querySelectorAll('input, select, textarea');
         const noteDisplay = document.getElementById('clinicalNote');
 
-        // 设置默认为今天的日期
         document.getElementById('visitDate').valueAsDate = new Date();
 
         function generateNote() {
-            // 获取表单数据
+            // Section 1
             const visitDate = document.getElementById('visitDate').value;
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
-            
+            const visitNumber = document.getElementById('visitNumber').value || '-';
             const weight = document.getElementById('weight').value || '-';
-            const diagnosis = document.getElementById('diagnosis').value;
-            const transfusionType = document.getElementById('transfusionType').value;
+            const diagnosis = document.getElementById('diagnosis').value || '-';
+            const transfusionType = document.getElementById('transfusionType').value || '-';
+            const transfusionFreq = document.getElementById('transfusionFreq').value || '-';
             
+            // Section 2
             const ferritin = document.getElementById('ferritin').value || '-';
+            const neutrophil = document.getElementById('neutrophil').value || '-';
             const mriCardiac = document.getElementById('mriCardiac').value || '-';
             const mriLiver = document.getElementById('mriLiver').value || '-';
             
-            const deferiproneDose = document.getElementById('deferiproneDose').value || 'Nil';
-            const deferasiroxDose = document.getElementById('deferasiroxDose').value || 'Nil';
-            const compliance = document.getElementById('compliance').value || 'Nil';
-            
-            const otherIssues = document.getElementById('otherIssues').value || 'Nil';
-            const plan = document.getElementById('plan').value || 'Nil';
+            // Section 3
+            const desferoxamine = document.getElementById('desferoxamine').value || 'N/A';
+            const desferoxamineIssues = document.getElementById('desferoxamineIssues').value || 'N/A';
+            const deferiproneDose = document.getElementById('deferiproneDose').value || 'N/A';
+            const deferasiroxDose = document.getElementById('deferasiroxDose').value || 'N/A';
+            const compliance = document.getElementById('compliance').value || '-';
+            const pillCounts = document.getElementById('pillCounts').value || '-';
 
-            // 格式化输出文本 (与原版 CSV TMTAC 格式对齐)
+            // Section 4 & 5
+            const vitC = document.getElementById('vitC').value || 'N/A';
+            const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
+            const diet = document.getElementById('diet').value || '-';
+            const splenectomy = document.getElementById('splenectomy').value || '-';
+            const physicalActivity = document.getElementById('physicalActivity').value || '-';
+            const vaccines = document.getElementById('vaccines').value || '-';
+
+            // Section 6
+            const otherIssues = document.getElementById('otherIssues').value || '-';
+            const plan = document.getElementById('plan').value || '-';
+            const tcaTmtac = document.getElementById('tcaTmtac').value || '-';
+            const tcaDr = document.getElementById('tcaDr').value || '-';
+
             const noteText = `=== TMTAC PHARMACIST NOTES ===
 Date: ${formattedDate}
+Visit Number: ${visitNumber}
 Weight (kg): ${weight}
 Diagnosis: ${diagnosis}
-Transfusional Types: ${transfusionType}
+Transfusional Types: ${transfusionType} (${transfusionFreq})
 
 [ LAB INVESTIGATIONS ]
 Serum Ferritin (ng/mL): ${ferritin}
+Neutrophil Count: ${neutrophil}
 MRI T2* (Cardiac): ${mriCardiac}
 MRI T2* (Liver): ${mriLiver}
 
-[ OTHER ISSUES ]
+[ CHELATION THERAPY ]
+Desferoxamine: ${desferoxamine} (Issues: ${desferoxamineIssues})
+Deferiprone: ${deferiproneDose}
+Deferasirox: ${deferasiroxDose}
+Adjunct (Vit C): ${vitC}
+Compliance / Missed Doses: ${compliance}
+Balance Pill Counts: ${pillCounts}
+Adverse Events / ADR: ${adverseEvents}
+
+[ LIFESTYLE & HISTORY ]
+Low-iron diet adherence: ${diet}
+Physical Activity: ${physicalActivity}
+History of Splenectomy: ${splenectomy}
+Vaccination Status: ${vaccines}
+
+[ PHARMACIST ASSESSMENT & PLAN ]
+Other Issues: 
 ${otherIssues}
 
-[ CHELATION THERAPY ]
-Deferiprone Dose: ${deferiproneDose}
-Deferasirox Dose: ${deferasiroxDose}
-Compliance / Missed Doses: ${compliance}
+Plan: 
+${plan}
 
-[ PHARMACIST PLAN ]
-${plan}`;
+TCA TMTAC: ${tcaTmtac}
+TCA DR: ${tcaDr}`;
 
             noteDisplay.textContent = noteText;
         }
 
-        // 监听所有输入框，有变动时立即更新右侧文本
         inputs.forEach(input => {
             input.addEventListener('input', generateNote);
             input.addEventListener('change', generateNote);
         });
 
-        // 复制到剪贴板功能
         function copyNote() {
             const textToCopy = noteDisplay.textContent;
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -238,7 +260,6 @@ ${plan}`;
             });
         }
 
-        // 初始化第一次渲染
         generateNote();
     </script>
 </body>
