@@ -147,7 +147,7 @@
 
         <div class="section-title">3. IRON CHELATION THERAPY</div>
         
-        <!-- Desferoxamine Specific Details (Expanded) -->
+        <!-- Desferoxamine Specific Details -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
             <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Desferoxamine (SC Infusion) Details</div>
             
@@ -169,7 +169,6 @@
             
             <div class="form-group" style="margin-bottom: 20px;"><label>Frequency of Missed Doses</label><input type="text" id="desfeMissed" placeholder="e.g. None, once a week"></div>
 
-            <!-- Preparation & Administration Sub-section -->
             <div style="padding-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Preparation & Administration</div>
                 <div class="grid-2">
@@ -218,7 +217,6 @@
             </div>
         </div>
 
-        <!-- Oral Chelation & General -->
         <div class="grid-2">
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
@@ -240,6 +238,22 @@
             <div class="form-group">
                 <label>Vitamin C Intake</label>
                 <select id="vitC">
+                    <option value="N/A">N/A</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Correct Intake of Vit C</label>
+                <select id="vitCCorrect">
+                    <option value="N/A">N/A</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Local Anaesthesia (EMLA)</label>
+                <select id="emla">
                     <option value="N/A">N/A</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
@@ -328,12 +342,17 @@
             const mriCardiac = document.getElementById('mriCardiac').value || '-';
             const mriLiver = document.getElementById('mriLiver').value || '-';
             
+            // Section 4 Adjuncts (Gathered here to place inside Desferoxamine block)
+            const vitC = document.getElementById('vitC').value;
+            const vitCCorrect = document.getElementById('vitCCorrect').value;
+            const emla = document.getElementById('emla').value;
+            const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
+            
             // Section 3
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
             const desfeDays = document.getElementById('desfeDays').value;
             const desfeMissed = document.getElementById('desfeMissed').value.trim();
             
-            // Prep & Admin variables
             const desfeIndep = document.getElementById('desfeIndep').value;
             const desfeWfi = document.getElementById('desfeWfi').value.trim() || '-';
             const desfeTime = document.getElementById('desfeTime').value.trim() || '-';
@@ -384,8 +403,13 @@
   ↳ Site Issues: ${desfeSiteIssues}
   ↳ Barriers: ${desfeBarriers}
   ↳ Needles: Single Use (${desfeSingleUse}), Correct Disposal (${desfeDisposal})`;
+
+                let adjunctText = `
+  [Adjunct Therapy]
+  ↳ Vitamin C Intake: ${vitC} (Correct Intake: ${vitCCorrect})
+  ↳ Local Anaesthesia (EMLA): ${emla}`;
                 
-                chelationDrugsText += `Desferoxamine (SC): ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${prepAdminText}\n\n`;
+                chelationDrugsText += `Desferoxamine (SC): ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${prepAdminText}${adjunctText}\n\n`;
             }
             
             if (isUsed(deferiproneDose)) {
@@ -399,9 +423,7 @@
                 chelationDrugsText = "None prescribed\n";
             }
 
-            // Section 4 & 5
-            const vitC = document.getElementById('vitC').value;
-            const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
+            // Section 5
             const diet = document.getElementById('diet').value;
             const splenectomy = document.getElementById('splenectomy').value;
             const physicalActivity = document.getElementById('physicalActivity').value || '-';
@@ -428,7 +450,6 @@ MRI T2* (Liver): ${mriLiver}
 
 [ CHELATION THERAPY ]
 ${chelationDrugsText}
-Adjunct (Vit C): ${vitC}
 Overall Compliance: ${compliance}
 Balance Pill Counts: ${pillCounts}
 Drug Adverse Events/Reactions: ${adverseEvents}
