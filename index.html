@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Auto-Calc)</title>
+    <title>TMTAC Data Entry Helper (Pro Calc)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -145,29 +145,37 @@
             <div class="form-group"><label>MRI T2* Liver (<7mg/g)</label><input type="text" id="mriLiver" placeholder="e.g. 19.1"></div>
         </div>
 
-        <div class="section-title">3. IRON CHELATION THERAPY & PILL COUNTS</div>
-        <div class="grid-2">
-            <div class="form-group"><label>Desferoxamine Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="e.g. 2000 (Blank if N/A)"></div>
-            <div class="form-group">
-                <label>Desferoxamine Freq (Days/wk)</label>
-                <select id="desfeDays">
-                    <option value="5">5 days/week</option>
-                    <option value="6">6 days/week</option>
-                    <option value="7">7 days/week</option>
-                    <option value="4">4 days/week</option>
-                    <option value="3">3 days/week</option>
-                    <option value="2">2 days/week</option>
-                    <option value="1">1 day/week</option>
-                </select>
+        <div class="section-title">3. IRON CHELATION THERAPY</div>
+        
+        <!-- Desferoxamine Specific Details -->
+        <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 13px;">Desferoxamine (SC Infusion)</div>
+            <div class="grid-2">
+                <div class="form-group"><label>Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="e.g. 2000 (Blank if N/A)"></div>
+                <div class="form-group">
+                    <label>Frequency (Days/wk)</label>
+                    <select id="desfeDays">
+                        <option value="5">5 days/week</option>
+                        <option value="6">6 days/week</option>
+                        <option value="7">7 days/week</option>
+                        <option value="4">4 days/week</option>
+                        <option value="3">3 days/week</option>
+                        <option value="2">2 days/week</option>
+                        <option value="1">1 day/week</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Missed Doses (Desferoxamine)</label><input type="text" id="desfeMissed" placeholder="e.g. once a week, none"></div>
+                <div class="form-group"><label>Prep & Admin Issues</label><input type="text" id="desfeAdmin" placeholder="e.g. WFI vol, site issues..."></div>
             </div>
-            <div class="form-group"><label>Desferoxamine Issues</label><input type="text" id="desferoxamineIssues" placeholder="If any issues..."></div>
-            <div class="form-group"></div>
-            
+        </div>
+
+        <!-- Oral Chelation & General -->
+        <div class="grid-2">
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
             
             <div class="form-group">
-                <label>Compliance / Missed Doses</label>
+                <label>Overall Compliance</label>
                 <select id="compliance">
                     <option value="Claimed compliant, no miss dose">Claimed compliant, no miss dose</option>
                     <option value="1-2 missed doses per week">1-2 missed doses per week</option>
@@ -236,7 +244,7 @@
             const visitDate = document.getElementById('visitDate').value;
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
             const visitNumber = document.getElementById('visitNumber').value || '-';
-            const weight = document.getElementById('weight').value; // Keep as raw string for calc check
+            const weight = document.getElementById('weight').value; 
             
             let diagnosis = document.getElementById('diagnosis').value;
             const otherDiagDiv = document.getElementById('otherDiagDiv');
@@ -274,7 +282,9 @@
             // Section 3
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
             const desfeDays = document.getElementById('desfeDays').value;
-            const desferoxamineIssues = document.getElementById('desferoxamineIssues').value.trim();
+            const desfeMissed = document.getElementById('desfeMissed').value.trim();
+            const desfeAdmin = document.getElementById('desfeAdmin').value.trim();
+            
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
@@ -292,11 +302,9 @@
                 let calcInfo = "";
                 
                 if (!isNaN(doseMg) && !isNaN(wtNum) && wtNum > 0) {
-                    // Formula: (Dose in mg * Days per week) / Weight / 7
                     const meanDailyMg = (doseMg * daysNum) / wtNum / 7;
                     calcInfo = `\n  ↳ Mean Daily Dose: ${meanDailyMg.toFixed(2)} mg/kg/day`;
                     
-                    // Bonus: Therapeutic Index Calculation
                     const ferrNum = parseFloat(ferritin);
                     if (!isNaN(ferrNum) && ferrNum > 0) {
                         const ti = meanDailyMg / ferrNum;
@@ -306,8 +314,10 @@
                     calcInfo = `\n  ↳ (Enter Patient Weight to auto-calculate Mean Daily Dose)`;
                 }
 
-                let issueText = desferoxamineIssues ? `\n  ↳ Issues: ${desferoxamineIssues}` : '';
-                chelationDrugsText += `Desferoxamine: ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${issueText}\n`;
+                let missedText = desfeMissed ? `\n  ↳ Missed Doses: ${desfeMissed}` : '';
+                let adminText = desfeAdmin ? `\n  ↳ Prep & Admin: ${desfeAdmin}` : '';
+                
+                chelationDrugsText += `Desferoxamine: ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${adminText}\n`;
             }
             
             if (isUsed(deferiproneDose)) {
@@ -350,7 +360,7 @@ MRI T2* (Liver): ${mriLiver}
 
 [ CHELATION THERAPY ]
 ${chelationDrugsText}Adjunct (Vit C): ${vitC}
-Compliance / Missed Doses: ${compliance}
+Overall Compliance: ${compliance}
 Balance Pill Counts: ${pillCounts}
 Adverse Events / ADR: ${adverseEvents}
 
