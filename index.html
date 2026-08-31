@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Pro Calc)</title>
+    <title>TMTAC Data Entry Helper (Ultimate Version)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -147,11 +147,12 @@
 
         <div class="section-title">3. IRON CHELATION THERAPY</div>
         
-        <!-- Desferoxamine Specific Details -->
-        <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 13px;">Desferoxamine (SC Infusion)</div>
+        <!-- Desferoxamine Specific Details (Expanded) -->
+        <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Desferoxamine (SC Infusion) Details</div>
+            
             <div class="grid-2">
-                <div class="form-group"><label>Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="e.g. 2000 (Blank if N/A)"></div>
+                <div class="form-group"><label>Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="Leave blank if not used"></div>
                 <div class="form-group">
                     <label>Frequency (Days/wk)</label>
                     <select id="desfeDays">
@@ -164,8 +165,56 @@
                         <option value="1">1 day/week</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Missed Doses (Desferoxamine)</label><input type="text" id="desfeMissed" placeholder="e.g. once a week, none"></div>
-                <div class="form-group"><label>Prep & Admin Issues</label><input type="text" id="desfeAdmin" placeholder="e.g. WFI vol, site issues..."></div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;"><label>Frequency of Missed Doses</label><input type="text" id="desfeMissed" placeholder="e.g. None, once a week"></div>
+
+            <!-- Preparation & Administration Sub-section -->
+            <div style="padding-top: 15px; border-top: 1px dashed #cbd5e1;">
+                <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Preparation & Administration</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Independence</label>
+                        <select id="desfeIndep">
+                            <option value="Independent">Independent</option>
+                            <option value="Dependent on Caregiver">Dependent on Caregiver</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Volume of WFI (ml)</label><input type="text" id="desfeWfi" placeholder="e.g. 10ml"></div>
+                    <div class="form-group"><label>Time start/stop infusion</label><input type="text" id="desfeTime" placeholder="e.g. 8pm - 6am"></div>
+                    <div class="form-group">
+                        <label>Injection Site</label>
+                        <select id="desfeSite">
+                            <option value="Abdomen">Abdomen</option>
+                            <option value="Thighs">Thighs</option>
+                            <option value="Arms">Arms</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rotation of Injection Site</label>
+                        <select id="desfeRotation">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Injection Site Issues</label><input type="text" id="desfeSiteIssues" placeholder="e.g. Redness, Pain (or None)"></div>
+                    <div class="form-group"><label>Barriers Encountered</label><input type="text" id="desfeBarriers" placeholder="e.g. Pump issues (or None)"></div>
+                    <div class="form-group">
+                        <label>Single Use of Needles</label>
+                        <select id="desfeSingleUse">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Disposal of Needles</label>
+                        <select id="desfeDisposal">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -196,7 +245,7 @@
                     <option value="No">No</option>
                 </select>
             </div>
-            <div class="form-group"><label>Adverse Events</label><input type="text" id="adverseEvents" value="N/A"></div>
+            <div class="form-group"><label>Adverse Events / Drug Reactions</label><input type="text" id="adverseEvents" value="N/A"></div>
         </div>
 
         <div class="section-title">5. LIFESTYLE, VACCINATION & OTHERS</div>
@@ -283,8 +332,18 @@
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
             const desfeDays = document.getElementById('desfeDays').value;
             const desfeMissed = document.getElementById('desfeMissed').value.trim();
-            const desfeAdmin = document.getElementById('desfeAdmin').value.trim();
             
+            // Prep & Admin variables
+            const desfeIndep = document.getElementById('desfeIndep').value;
+            const desfeWfi = document.getElementById('desfeWfi').value.trim() || '-';
+            const desfeTime = document.getElementById('desfeTime').value.trim() || '-';
+            const desfeSite = document.getElementById('desfeSite').value;
+            const desfeRotation = document.getElementById('desfeRotation').value;
+            const desfeSiteIssues = document.getElementById('desfeSiteIssues').value.trim() || '-';
+            const desfeBarriers = document.getElementById('desfeBarriers').value.trim() || '-';
+            const desfeSingleUse = document.getElementById('desfeSingleUse').value;
+            const desfeDisposal = document.getElementById('desfeDisposal').value;
+
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
@@ -314,10 +373,19 @@
                     calcInfo = `\n  ↳ (Enter Patient Weight to auto-calculate Mean Daily Dose)`;
                 }
 
-                let missedText = desfeMissed ? `\n  ↳ Missed Doses: ${desfeMissed}` : '';
-                let adminText = desfeAdmin ? `\n  ↳ Prep & Admin: ${desfeAdmin}` : '';
+                let missedText = desfeMissed ? `\n  ↳ Missed Doses: ${desfeMissed}` : '\n  ↳ Missed Doses: None';
                 
-                chelationDrugsText += `Desferoxamine: ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${adminText}\n`;
+                let prepAdminText = `
+  [Preparation & Administration]
+  ↳ Independence: ${desfeIndep}
+  ↳ Vol of WFI per dose: ${desfeWfi}
+  ↳ Time start/stop: ${desfeTime}
+  ↳ Injection Site: ${desfeSite} (Rotation: ${desfeRotation})
+  ↳ Site Issues: ${desfeSiteIssues}
+  ↳ Barriers: ${desfeBarriers}
+  ↳ Needles: Single Use (${desfeSingleUse}), Correct Disposal (${desfeDisposal})`;
+                
+                chelationDrugsText += `Desferoxamine (SC): ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${prepAdminText}\n\n`;
             }
             
             if (isUsed(deferiproneDose)) {
@@ -359,10 +427,11 @@ MRI T2* (Cardiac): ${mriCardiac}
 MRI T2* (Liver): ${mriLiver}
 
 [ CHELATION THERAPY ]
-${chelationDrugsText}Adjunct (Vit C): ${vitC}
+${chelationDrugsText}
+Adjunct (Vit C): ${vitC}
 Overall Compliance: ${compliance}
 Balance Pill Counts: ${pillCounts}
-Adverse Events / ADR: ${adverseEvents}
+Drug Adverse Events/Reactions: ${adverseEvents}
 
 [ LIFESTYLE & HISTORY ]
 Low-iron diet adherence: ${diet}
