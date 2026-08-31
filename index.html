@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Live Calc UI)</title>
+    <title>TMTAC Data Entry Helper (Ultimate Version)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -86,7 +86,7 @@
             font-weight: bold;
             font-size: 14px;
             color: #0c4a6e;
-            pointer-events: none; /* makes it read-only visually */
+            pointer-events: none;
         }
 
         pre {
@@ -172,7 +172,7 @@
         
         <!-- Desferoxamine Specific Details -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Desferoxamine (SC Infusion) Details</div>
+            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Desferoxamine (SC Infusion)</div>
             
             <div class="grid-2">
                 <div class="form-group"><label>Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="Leave blank if not used"></div>
@@ -190,7 +190,7 @@
                 </div>
             </div>
 
-            <!-- LIVE CALCULATION DISPLAY BOX -->
+            <!-- LIVE CALCULATION DISPLAY BOX FOR DESFEROXAMINE -->
             <div class="grid-2 calc-display" id="liveCalcBox">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Mean Daily Dose (mg/kg/day)</label>
@@ -283,9 +283,29 @@
             </div>
         </div>
 
+        <!-- Deferiprone Specific Details -->
+        <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+            <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Deferiprone Details</div>
+            <div class="grid-2">
+                <div class="form-group"><label>Dose Administered</label><input type="text" id="deferiproneDose" placeholder="e.g. 2g BD (Blank if N/A)"></div>
+                <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferiproneTotalMg" placeholder="e.g. 4000"></div>
+            </div>
+            
+            <div class="grid-2 calc-display">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Daily Dose (mg/kg/day)</label>
+                    <input type="text" id="uiDefDailyDose" readonly value="Need Weight & Total mg">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Freq. of Missed Doses</label>
+                    <input type="text" id="defMissed" placeholder="e.g. None">
+                </div>
+            </div>
+        </div>
+
+        <!-- Deferasirox & General Oral Chelation -->
         <div class="grid-2">
-            <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
-            <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
+            <div class="form-group"><label>Deferasirox Dose Administered</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
             
             <div class="form-group">
                 <label>Overall Compliance</label>
@@ -400,7 +420,12 @@
             const desfeSingleUse = document.getElementById('desfeSingleUse').value;
             const desfeDisposal = document.getElementById('desfeDisposal').value;
 
+            // Section 3 - Deferiprone specifics
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
+            const deferiproneTotalMg = document.getElementById('deferiproneTotalMg').value;
+            const defMissed = document.getElementById('defMissed').value.trim();
+
+            // Section 3 - Deferasirox specifics
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
@@ -408,13 +433,17 @@
             // Reset UI calc displays
             const uiMeanDose = document.getElementById('uiMeanDose');
             const uiTheraIndex = document.getElementById('uiTheraIndex');
+            const uiDefDailyDose = document.getElementById('uiDefDailyDose');
+            
             uiMeanDose.value = "Need Weight & Dose";
             uiTheraIndex.value = "Need Ferritin value";
+            uiDefDailyDose.value = "Need Weight & Total mg";
 
             // Smart Chelation logic & AUTO CALCULATIONS
             let chelationDrugsText = "";
             const isUsed = (val) => val && val.toLowerCase() !== 'nil' && val.toLowerCase() !== 'n/a' && val !== '-' && val !== '0';
 
+            // Desferoxamine Logic
             if (isUsed(desferoxamine)) {
                 const doseMg = parseFloat(desferoxamine);
                 const daysNum = parseFloat(desfeDays);
@@ -424,13 +453,13 @@
                 if (!isNaN(doseMg) && !isNaN(wtNum) && wtNum > 0) {
                     const meanDailyMg = (doseMg * daysNum) / wtNum / 7;
                     calcInfo = `\n  ↳ Mean Daily Dose: ${meanDailyMg.toFixed(2)} mg/kg/day`;
-                    uiMeanDose.value = meanDailyMg.toFixed(2); // UPDATE UI LEFT PANEL
+                    uiMeanDose.value = meanDailyMg.toFixed(2);
                     
                     const ferrNum = parseFloat(ferritin);
                     if (!isNaN(ferrNum) && ferrNum > 0) {
                         const ti = meanDailyMg / ferrNum;
                         calcInfo += `\n  ↳ Therapeutic Index: ${ti.toFixed(4)}`;
-                        uiTheraIndex.value = ti.toFixed(4); // UPDATE UI LEFT PANEL
+                        uiTheraIndex.value = ti.toFixed(4);
                     }
                 } else {
                     calcInfo = `\n  ↳ (Enter Patient Weight to auto-calculate Mean Daily Dose)`;
@@ -459,15 +488,35 @@
                 uiTheraIndex.value = "N/A";
             }
             
+            // Deferiprone Logic
             if (isUsed(deferiproneDose)) {
-                chelationDrugsText += `Deferiprone: ${deferiproneDose}\n`;
+                let defCalcInfo = "";
+                const defMg = parseFloat(deferiproneTotalMg);
+                const wtNum = parseFloat(weight);
+
+                if (!isNaN(defMg) && !isNaN(wtNum) && wtNum > 0) {
+                    const defDailyMgKg = defMg / wtNum;
+                    defCalcInfo = `\n  ↳ Daily Dose: ${defDailyMgKg.toFixed(2)} mg/kg/day`;
+                    uiDefDailyDose.value = defDailyMgKg.toFixed(2);
+                } else {
+                    defCalcInfo = `\n  ↳ (Enter Weight & Total Daily mg to auto-calculate)`;
+                    uiDefDailyDose.value = "N/A";
+                }
+
+                let defMissedText = defMissed ? `\n  ↳ Missed Doses: ${defMissed}` : '\n  ↳ Missed Doses: None';
+                
+                chelationDrugsText += `Deferiprone: ${deferiproneDose}${defCalcInfo}${defMissedText}\n\n`;
+            } else {
+                uiDefDailyDose.value = "N/A";
             }
+
+            // Deferasirox Logic
             if (isUsed(deferasiroxDose)) {
-                chelationDrugsText += `Deferasirox: ${deferasiroxDose}\n`;
+                chelationDrugsText += `Deferasirox: ${deferasiroxDose}\n\n`;
             }
             
             if (chelationDrugsText === "") {
-                chelationDrugsText = "None prescribed\n";
+                chelationDrugsText = "None prescribed\n\n";
             }
 
             // Section 4
@@ -499,8 +548,7 @@ MRI T2* (Cardiac): ${mriCardiac}
 MRI T2* (Liver): ${mriLiver}
 
 [ CHELATION THERAPY ]
-${chelationDrugsText}
-[ PILL COUNTS & COMPLIANCE ]
+${chelationDrugsText}[ PILL COUNTS & COMPLIANCE ]
 Overall Compliance: ${compliance}
 Balance Pill Counts: ${pillCounts}
 
