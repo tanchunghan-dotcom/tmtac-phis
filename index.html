@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Ultimate Version)</title>
+    <title>TMTAC Data Entry Helper (Live Calc UI)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -66,6 +66,29 @@
             font-size: 13px;
         }
         textarea { resize: vertical; height: 50px; }
+        
+        /* Auto-calc display box styling */
+        .calc-display {
+            background-color: #e0f2fe;
+            border: 1px solid #bae6fd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .calc-display label {
+            color: #0369a1;
+            font-size: 12px;
+        }
+        .calc-display input {
+            background: transparent;
+            border: none;
+            padding: 0;
+            font-weight: bold;
+            font-size: 14px;
+            color: #0c4a6e;
+            pointer-events: none; /* makes it read-only visually */
+        }
+
         pre {
             white-space: pre-wrap;
             font-family: monospace;
@@ -166,10 +189,21 @@
                     </select>
                 </div>
             </div>
+
+            <!-- LIVE CALCULATION DISPLAY BOX -->
+            <div class="grid-2 calc-display" id="liveCalcBox">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Mean Daily Dose (mg/kg/day)</label>
+                    <input type="text" id="uiMeanDose" readonly value="Need Weight & Dose">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Therapeutic Index</label>
+                    <input type="text" id="uiTheraIndex" readonly value="Need Ferritin value">
+                </div>
+            </div>
             
             <div class="form-group" style="margin-bottom: 20px;"><label>Frequency of Missed Doses</label><input type="text" id="desfeMissed" placeholder="e.g. None, once a week"></div>
 
-            <!-- Preparation & Administration -->
             <div style="padding-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Preparation & Administration</div>
                 <div class="grid-2">
@@ -217,7 +251,7 @@
                 </div>
             </div>
 
-            <!-- Adjunct Therapy (Moved inside Desferoxamine section) -->
+            <!-- Adjunct Therapy -->
             <div style="padding-top: 15px; margin-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Adjunct Therapy (For Desferoxamine)</div>
                 <div class="grid-2">
@@ -249,7 +283,6 @@
             </div>
         </div>
 
-        <!-- Oral Chelation -->
         <div class="grid-2">
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
@@ -318,7 +351,6 @@
             
             let diagnosis = document.getElementById('diagnosis').value;
             const otherDiagDiv = document.getElementById('otherDiagDiv');
-            
             if (diagnosis === 'Others') {
                 otherDiagDiv.style.display = 'block';
                 const otherVal = document.getElementById('otherDiagnosis').value;
@@ -330,7 +362,6 @@
             const transfusionType = document.getElementById('transfusionType').value;
             const transfusionFreqDiv = document.getElementById('transfusionFreqDiv');
             let transfusionFreq = '';
-            
             if (transfusionType === 'Non-Transfusional Dependant (NTDT)') {
                 transfusionFreqDiv.style.display = 'none';
             } else {
@@ -369,11 +400,16 @@
             const desfeSingleUse = document.getElementById('desfeSingleUse').value;
             const desfeDisposal = document.getElementById('desfeDisposal').value;
 
-            // Section 3 - Oral Chelation
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
+
+            // Reset UI calc displays
+            const uiMeanDose = document.getElementById('uiMeanDose');
+            const uiTheraIndex = document.getElementById('uiTheraIndex');
+            uiMeanDose.value = "Need Weight & Dose";
+            uiTheraIndex.value = "Need Ferritin value";
 
             // Smart Chelation logic & AUTO CALCULATIONS
             let chelationDrugsText = "";
@@ -388,11 +424,13 @@
                 if (!isNaN(doseMg) && !isNaN(wtNum) && wtNum > 0) {
                     const meanDailyMg = (doseMg * daysNum) / wtNum / 7;
                     calcInfo = `\n  ↳ Mean Daily Dose: ${meanDailyMg.toFixed(2)} mg/kg/day`;
+                    uiMeanDose.value = meanDailyMg.toFixed(2); // UPDATE UI LEFT PANEL
                     
                     const ferrNum = parseFloat(ferritin);
                     if (!isNaN(ferrNum) && ferrNum > 0) {
                         const ti = meanDailyMg / ferrNum;
                         calcInfo += `\n  ↳ Therapeutic Index: ${ti.toFixed(4)}`;
+                        uiTheraIndex.value = ti.toFixed(4); // UPDATE UI LEFT PANEL
                     }
                 } else {
                     calcInfo = `\n  ↳ (Enter Patient Weight to auto-calculate Mean Daily Dose)`;
@@ -416,6 +454,9 @@
   ↳ Local Anaesthesia (EMLA): ${emla}`;
                 
                 chelationDrugsText += `Desferoxamine (SC): ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${missedText}${prepAdminText}${adjunctText}\n\n`;
+            } else {
+                uiMeanDose.value = "N/A";
+                uiTheraIndex.value = "N/A";
             }
             
             if (isUsed(deferiproneDose)) {
