@@ -169,6 +169,7 @@
             
             <div class="form-group" style="margin-bottom: 20px;"><label>Frequency of Missed Doses</label><input type="text" id="desfeMissed" placeholder="e.g. None, once a week"></div>
 
+            <!-- Preparation & Administration -->
             <div style="padding-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Preparation & Administration</div>
                 <div class="grid-2">
@@ -215,8 +216,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Adjunct Therapy (Moved inside Desferoxamine section) -->
+            <div style="padding-top: 15px; margin-top: 15px; border-top: 1px dashed #cbd5e1;">
+                <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Adjunct Therapy (For Desferoxamine)</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Vitamin C Intake</label>
+                        <select id="vitC">
+                            <option value="N/A">N/A</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Intake of Vit C</label>
+                        <select id="vitCCorrect">
+                            <option value="N/A">N/A</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Local Anaesthesia (EMLA)</label>
+                        <select id="emla">
+                            <option value="N/A">N/A</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Oral Chelation -->
         <div class="grid-2">
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
@@ -233,34 +266,8 @@
             <div class="form-group"><label>Balance Pill Counts</label><input type="text" id="pillCounts" placeholder="e.g. Half bottle Deferiprone, 30's Deferasirox"></div>
         </div>
 
-        <div class="section-title">4. ADJUNCT THERAPY & ADVERSE EVENTS</div>
-        <div class="grid-2">
-            <div class="form-group">
-                <label>Vitamin C Intake</label>
-                <select id="vitC">
-                    <option value="N/A">N/A</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Correct Intake of Vit C</label>
-                <select id="vitCCorrect">
-                    <option value="N/A">N/A</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Local Anaesthesia (EMLA)</label>
-                <select id="emla">
-                    <option value="N/A">N/A</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Adverse Events / Drug Reactions</label><input type="text" id="adverseEvents" value="N/A"></div>
-        </div>
+        <div class="section-title">4. DRUG ADVERSE EVENT / REACTION MONITORING</div>
+        <div class="form-group"><label>Reported Adverse Events</label><textarea id="adverseEvents" style="height: 50px;">N/A (No issues reported)</textarea></div>
 
         <div class="section-title">5. LIFESTYLE, VACCINATION & OTHERS</div>
         <div class="grid-2">
@@ -342,13 +349,12 @@
             const mriCardiac = document.getElementById('mriCardiac').value || '-';
             const mriLiver = document.getElementById('mriLiver').value || '-';
             
-            // Section 4 Adjuncts (Gathered here to place inside Desferoxamine block)
+            // Section 3 - Adjuncts
             const vitC = document.getElementById('vitC').value;
             const vitCCorrect = document.getElementById('vitCCorrect').value;
             const emla = document.getElementById('emla').value;
-            const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
             
-            // Section 3
+            // Section 3 - Desferoxamine specifics
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
             const desfeDays = document.getElementById('desfeDays').value;
             const desfeMissed = document.getElementById('desfeMissed').value.trim();
@@ -363,6 +369,7 @@
             const desfeSingleUse = document.getElementById('desfeSingleUse').value;
             const desfeDisposal = document.getElementById('desfeDisposal').value;
 
+            // Section 3 - Oral Chelation
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
@@ -378,7 +385,6 @@
                 const wtNum = parseFloat(weight);
                 
                 let calcInfo = "";
-                
                 if (!isNaN(doseMg) && !isNaN(wtNum) && wtNum > 0) {
                     const meanDailyMg = (doseMg * daysNum) / wtNum / 7;
                     calcInfo = `\n  ↳ Mean Daily Dose: ${meanDailyMg.toFixed(2)} mg/kg/day`;
@@ -423,6 +429,9 @@
                 chelationDrugsText = "None prescribed\n";
             }
 
+            // Section 4
+            const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
+
             // Section 5
             const diet = document.getElementById('diet').value;
             const splenectomy = document.getElementById('splenectomy').value;
@@ -450,9 +459,12 @@ MRI T2* (Liver): ${mriLiver}
 
 [ CHELATION THERAPY ]
 ${chelationDrugsText}
+[ PILL COUNTS & COMPLIANCE ]
 Overall Compliance: ${compliance}
 Balance Pill Counts: ${pillCounts}
-Drug Adverse Events/Reactions: ${adverseEvents}
+
+[ DRUG ADVERSE EVENT / REACTION MONITORING ]
+Reported Issues: ${adverseEvents}
 
 [ LIFESTYLE & HISTORY ]
 Low-iron diet adherence: ${diet}
