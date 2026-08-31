@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMTAC Data Entry Helper (Smart Chelation)</title>
+    <title>TMTAC Data Entry Helper (Auto-Calc)</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -99,7 +99,7 @@
         <div class="grid-2">
             <div class="form-group"><label>Visit Date</label><input type="date" id="visitDate"></div>
             <div class="form-group"><label>Visit Number</label><input type="text" id="visitNumber" placeholder="e.g. 1"></div>
-            <div class="form-group"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 55"></div>
+            <div class="form-group"><label>Weight (kg) - required for calc</label><input type="number" id="weight" placeholder="e.g. 55"></div>
             
             <div class="form-group">
                 <label>Diagnosis</label>
@@ -124,7 +124,6 @@
                 </select>
             </div>
             
-            <!-- 增加了 id="transfusionFreqDiv" 用来控制显示和隐藏 -->
             <div class="form-group" id="transfusionFreqDiv">
                 <label>Transfusion Frequency</label>
                 <select id="transfusionFreq">
@@ -140,7 +139,7 @@
 
         <div class="section-title">2. LAB INVESTIGATIONS</div>
         <div class="grid-2">
-            <div class="form-group"><label>Serum Ferritin (ng/mL)</label><input type="text" id="ferritin" placeholder="e.g. 1511.6 (20/1/2026)"></div>
+            <div class="form-group"><label>Serum Ferritin (ng/mL)</label><input type="number" id="ferritin" placeholder="e.g. 1511.6"></div>
             <div class="form-group"><label>Neutrophil Count</label><input type="text" id="neutrophil" placeholder="e.g. 2.5"></div>
             <div class="form-group"><label>MRI T2* Cardiac (>20ms)</label><input type="text" id="mriCardiac" placeholder="e.g. 45.7"></div>
             <div class="form-group"><label>MRI T2* Liver (<7mg/g)</label><input type="text" id="mriLiver" placeholder="e.g. 19.1"></div>
@@ -148,8 +147,22 @@
 
         <div class="section-title">3. IRON CHELATION THERAPY & PILL COUNTS</div>
         <div class="grid-2">
-            <div class="form-group"><label>Desferoxamine Dose</label><input type="text" id="desferoxamine" placeholder="Leave blank if not used"></div>
+            <div class="form-group"><label>Desferoxamine Dose/Day (mg)</label><input type="number" id="desferoxamine" placeholder="e.g. 2000 (Blank if N/A)"></div>
+            <div class="form-group">
+                <label>Desferoxamine Freq (Days/wk)</label>
+                <select id="desfeDays">
+                    <option value="5">5 days/week</option>
+                    <option value="6">6 days/week</option>
+                    <option value="7">7 days/week</option>
+                    <option value="4">4 days/week</option>
+                    <option value="3">3 days/week</option>
+                    <option value="2">2 days/week</option>
+                    <option value="1">1 day/week</option>
+                </select>
+            </div>
             <div class="form-group"><label>Desferoxamine Issues</label><input type="text" id="desferoxamineIssues" placeholder="If any issues..."></div>
+            <div class="form-group"></div>
+            
             <div class="form-group"><label>Deferiprone Dose</label><input type="text" id="deferiproneDose" placeholder="Leave blank if not used"></div>
             <div class="form-group"><label>Deferasirox Dose</label><input type="text" id="deferasiroxDose" placeholder="Leave blank if not used"></div>
             
@@ -223,9 +236,8 @@
             const visitDate = document.getElementById('visitDate').value;
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
             const visitNumber = document.getElementById('visitNumber').value || '-';
-            const weight = document.getElementById('weight').value || '-';
+            const weight = document.getElementById('weight').value; // Keep as raw string for calc check
             
-            // Diagnosis Logic
             let diagnosis = document.getElementById('diagnosis').value;
             const otherDiagDiv = document.getElementById('otherDiagDiv');
             
@@ -237,15 +249,14 @@
                 otherDiagDiv.style.display = 'none';
             }
 
-            // Transfusion Type Logic
             const transfusionType = document.getElementById('transfusionType').value;
             const transfusionFreqDiv = document.getElementById('transfusionFreqDiv');
             let transfusionFreq = '';
             
             if (transfusionType === 'Non-Transfusional Dependant (NTDT)') {
-                transfusionFreqDiv.style.display = 'none'; // 隐藏频率选择框
+                transfusionFreqDiv.style.display = 'none';
             } else {
-                transfusionFreqDiv.style.display = 'block'; // 显示频率选择框
+                transfusionFreqDiv.style.display = 'block';
                 transfusionFreq = document.getElementById('transfusionFreq').value;
             }
             
@@ -255,27 +266,50 @@
             }
 
             // Section 2
-            const ferritin = document.getElementById('ferritin').value || '-';
+            const ferritin = document.getElementById('ferritin').value;
             const neutrophil = document.getElementById('neutrophil').value || '-';
             const mriCardiac = document.getElementById('mriCardiac').value || '-';
             const mriLiver = document.getElementById('mriLiver').value || '-';
             
             // Section 3
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
+            const desfeDays = document.getElementById('desfeDays').value;
             const desferoxamineIssues = document.getElementById('desferoxamineIssues').value.trim();
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
 
-            // Smart Chelation logic
+            // Smart Chelation logic & AUTO CALCULATIONS
             let chelationDrugsText = "";
-            const isUsed = (val) => val && val.toLowerCase() !== 'nil' && val.toLowerCase() !== 'n/a' && val !== '-';
+            const isUsed = (val) => val && val.toLowerCase() !== 'nil' && val.toLowerCase() !== 'n/a' && val !== '-' && val !== '0';
 
             if (isUsed(desferoxamine)) {
-                let issueText = desferoxamineIssues ? ` (Issues: ${desferoxamineIssues})` : '';
-                chelationDrugsText += `Desferoxamine: ${desferoxamine}${issueText}\n`;
+                const doseMg = parseFloat(desferoxamine);
+                const daysNum = parseFloat(desfeDays);
+                const wtNum = parseFloat(weight);
+                
+                let calcInfo = "";
+                
+                if (!isNaN(doseMg) && !isNaN(wtNum) && wtNum > 0) {
+                    // Formula: (Dose in mg * Days per week) / Weight / 7
+                    const meanDailyMg = (doseMg * daysNum) / wtNum / 7;
+                    calcInfo = `\n  ↳ Mean Daily Dose: ${meanDailyMg.toFixed(2)} mg/kg/day`;
+                    
+                    // Bonus: Therapeutic Index Calculation
+                    const ferrNum = parseFloat(ferritin);
+                    if (!isNaN(ferrNum) && ferrNum > 0) {
+                        const ti = meanDailyMg / ferrNum;
+                        calcInfo += `\n  ↳ Therapeutic Index: ${ti.toFixed(4)}`;
+                    }
+                } else {
+                    calcInfo = `\n  ↳ (Enter Patient Weight to auto-calculate Mean Daily Dose)`;
+                }
+
+                let issueText = desferoxamineIssues ? `\n  ↳ Issues: ${desferoxamineIssues}` : '';
+                chelationDrugsText += `Desferoxamine: ${desferoxamine} mg x ${desfeDays} days/week${calcInfo}${issueText}\n`;
             }
+            
             if (isUsed(deferiproneDose)) {
                 chelationDrugsText += `Deferiprone: ${deferiproneDose}\n`;
             }
@@ -304,12 +338,12 @@
             const noteText = `=== TMTAC PHARMACIST NOTES ===
 Date: ${formattedDate}
 Visit Number: ${visitNumber}
-Weight (kg): ${weight}
+Weight (kg): ${weight || '-'}
 Diagnosis: ${diagnosis}
 Transfusional Types: ${finalTransfusionText}
 
 [ LAB INVESTIGATIONS ]
-Serum Ferritin (ng/mL): ${ferritin}
+Serum Ferritin (ng/mL): ${ferritin || '-'}
 Neutrophil Count: ${neutrophil}
 MRI T2* (Cardiac): ${mriCardiac}
 MRI T2* (Liver): ${mriLiver}
