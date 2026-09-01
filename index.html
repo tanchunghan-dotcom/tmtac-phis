@@ -344,7 +344,7 @@
                 </select>
             </div>
             
-            <!-- 疫苗区块：默认隐藏，只有选了 Yes 才会显示 -->
+            <!-- 疫苗区块 -->
             <div id="vaccineDiv" style="display: none; grid-column: span 2; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 5px;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #475569; font-size: 13px;">Post-Splenectomy Vaccines (Last Date Taken)</div>
                 <div class="grid-2">
@@ -355,9 +355,14 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Other Issues 移到了这里，并清空默认文本 -->
+        <div class="form-group" style="margin-top: 15px;">
+            <label>Other Issues (Patient well? Symptoms?)</label>
+            <textarea id="otherIssues" placeholder="e.g. 1) Pt well, asymptomatic. 2) Patient do not have Desferal Pump."></textarea>
+        </div>
 
         <div class="section-title">6. PHARMACIST PLAN & TCA</div>
-        <div class="form-group"><label>Other Issues (Patient well? Symptoms?)</label><textarea id="otherIssues">Pt well, asymptomatic. Pt claimed compliance to the meds, no miss dose and has good knowledge on the diet.</textarea></div>
         <div class="form-group"><label>Pharmacist Plan</label><textarea id="plan">Suggest to continue all medications. To reassess medication compliance. To monitor Serum Ferritin level.</textarea></div>
         <div class="grid-2">
             <div class="form-group"><label>TCA TMTAC</label><input type="text" id="tcaTmtac" placeholder="Date/Duration"></div>
@@ -635,10 +640,10 @@ Low-iron diet adherence: ${diet}
 Physical Activity: ${physicalActivity}
 History of Splenectomy: ${splenectomy}${vaccinesText}
 
-[ PHARMACIST ASSESSMENT & PLAN ]
 Other Issues: 
 ${otherIssues}
 
+[ PHARMACIST ASSESSMENT & PLAN ]
 Plan: 
 ${plan}
 
