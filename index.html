@@ -288,15 +288,14 @@
                 <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferiproneTotalMg" placeholder="Auto-calculated (or type manual)"></div>
             </div>
             
-            <div class="grid-2 calc-display">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Daily Dose (mg/kg/day)</label>
-                    <input type="text" id="uiDefDailyDose" readonly value="Need Weight & Dose">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Freq. of Missed Doses</label>
-                    <input type="text" id="defMissed" placeholder="e.g. None">
-                </div>
+            <div class="calc-display" style="margin-bottom: 15px;">
+                <label>Daily Dose (mg/kg/day)</label>
+                <input type="text" id="uiDefDailyDose" readonly value="Need Weight & Dose">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Frequency of Missed Doses</label>
+                <input type="text" id="defMissed" placeholder="e.g. None, once a week">
             </div>
         </div>
 
@@ -308,15 +307,14 @@
                 <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferasiroxTotalMg" placeholder="Auto-calculated (or type manual)"></div>
             </div>
             
-            <div class="grid-2 calc-display">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Daily Dose (mg/kg/day)</label>
-                    <input type="text" id="uiDefaDailyDose" readonly value="Need Weight & Dose">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Freq. of Missed Doses</label>
-                    <input type="text" id="defaMissed" placeholder="e.g. None">
-                </div>
+            <div class="calc-display" style="margin-bottom: 15px;">
+                <label>Daily Dose (mg/kg/day)</label>
+                <input type="text" id="uiDefaDailyDose" readonly value="Need Weight & Dose">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label>Frequency of Missed Doses</label>
+                <input type="text" id="defaMissed" placeholder="e.g. None, once a week">
             </div>
         </div>
 
@@ -380,17 +378,14 @@
             if (!doseStr) return "";
             doseStr = doseStr.toUpperCase();
             
-            // 抓取数字与单位
             const match = doseStr.match(/([\d.]+)\s*(MG|G)?/);
             if (!match) return "";
             
             let amount = parseFloat(match[1]);
-            let unit = match[2] || "MG"; // 默认视为 mg
+            let unit = match[2] || "MG"; 
             
-            // 如果单位是 G，换算成 mg
             if (unit === "G") amount *= 1000;
             
-            // 抓取频率
             let freq = 1;
             if (doseStr.includes("BD")) freq = 2;
             else if (doseStr.includes("TDS")) freq = 3;
@@ -400,7 +395,6 @@
             return (amount * freq).toString();
         }
 
-        // 监听 Deferiprone 输入并自动填入 Total Mg
         document.getElementById('deferiproneDose').addEventListener('input', function() {
             const calculated = autoCalculateMg(this.value);
             if(calculated) {
@@ -410,7 +404,6 @@
             }
         });
 
-        // 监听 Deferasirox 输入并自动填入 Total Mg
         document.getElementById('deferasiroxDose').addEventListener('input', function() {
             const calculated = autoCalculateMg(this.value);
             if(calculated) {
