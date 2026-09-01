@@ -67,7 +67,6 @@
         }
         textarea { resize: vertical; height: 50px; }
         
-        /* Auto-calc display box styling */
         .calc-display {
             background-color: #e0f2fe;
             border: 1px solid #bae6fd;
@@ -170,7 +169,7 @@
 
         <div class="section-title">3. IRON CHELATION THERAPY</div>
         
-        <!-- Desferoxamine Specific Details -->
+        <!-- Desferoxamine -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
             <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Desferoxamine (SC Infusion)</div>
             
@@ -190,7 +189,6 @@
                 </div>
             </div>
 
-            <!-- LIVE CALCULATION DISPLAY BOX FOR DESFEROXAMINE -->
             <div class="grid-2 calc-display" id="liveCalcBox">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Mean Daily Dose (mg/kg/day)</label>
@@ -251,7 +249,6 @@
                 </div>
             </div>
 
-            <!-- Adjunct Therapy -->
             <div style="padding-top: 15px; margin-top: 15px; border-top: 1px dashed #cbd5e1;">
                 <div style="font-weight: 600; margin-bottom: 12px; color: #2563eb; font-size: 13px;">Adjunct Therapy (For Desferoxamine)</div>
                 <div class="grid-2">
@@ -283,18 +280,18 @@
             </div>
         </div>
 
-        <!-- Deferiprone Specific Details -->
+        <!-- Deferiprone -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
             <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Deferiprone Details</div>
             <div class="grid-2">
-                <div class="form-group"><label>Dose Administered</label><input type="text" id="deferiproneDose" placeholder="e.g. 2g BD (Blank if N/A)"></div>
-                <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferiproneTotalMg" placeholder="e.g. 4000"></div>
+                <div class="form-group"><label>Dose Administered</label><input type="text" id="deferiproneDose" placeholder="e.g. 2g BD"></div>
+                <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferiproneTotalMg" placeholder="Auto-calculated (or type manual)"></div>
             </div>
             
             <div class="grid-2 calc-display">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Daily Dose (mg/kg/day)</label>
-                    <input type="text" id="uiDefDailyDose" readonly value="Need Weight & Total mg">
+                    <input type="text" id="uiDefDailyDose" readonly value="Need Weight & Dose">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Freq. of Missed Doses</label>
@@ -303,18 +300,18 @@
             </div>
         </div>
 
-        <!-- Deferasirox Specific Details -->
+        <!-- Deferasirox -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
             <div style="font-weight: bold; margin-bottom: 10px; color: #475569; font-size: 14px;">Deferasirox Details</div>
             <div class="grid-2">
-                <div class="form-group"><label>Dose Administered</label><input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD (Blank if N/A)"></div>
-                <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferasiroxTotalMg" placeholder="e.g. 1440"></div>
+                <div class="form-group"><label>Dose Administered</label><input type="text" id="deferasiroxDose" placeholder="e.g. 1440mg OD"></div>
+                <div class="form-group"><label>Total Daily Dose (mg)</label><input type="number" id="deferasiroxTotalMg" placeholder="Auto-calculated (or type manual)"></div>
             </div>
             
             <div class="grid-2 calc-display">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Daily Dose (mg/kg/day)</label>
-                    <input type="text" id="uiDefaDailyDose" readonly value="Need Weight & Total mg">
+                    <input type="text" id="uiDefaDailyDose" readonly value="Need Weight & Dose">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>Freq. of Missed Doses</label>
@@ -323,7 +320,6 @@
             </div>
         </div>
 
-        <!-- General Oral Chelation -->
         <div class="grid-2">
             <div class="form-group">
                 <label>Overall Compliance</label>
@@ -377,11 +373,54 @@
     <script>
         const inputs = document.querySelectorAll('input, select, textarea');
         const noteDisplay = document.getElementById('clinicalNote');
-
         document.getElementById('visitDate').valueAsDate = new Date();
 
+        // 自动计算毫克 (mg) 的解析函数
+        function autoCalculateMg(doseStr) {
+            if (!doseStr) return "";
+            doseStr = doseStr.toUpperCase();
+            
+            // 抓取数字与单位
+            const match = doseStr.match(/([\d.]+)\s*(MG|G)?/);
+            if (!match) return "";
+            
+            let amount = parseFloat(match[1]);
+            let unit = match[2] || "MG"; // 默认视为 mg
+            
+            // 如果单位是 G，换算成 mg
+            if (unit === "G") amount *= 1000;
+            
+            // 抓取频率
+            let freq = 1;
+            if (doseStr.includes("BD")) freq = 2;
+            else if (doseStr.includes("TDS")) freq = 3;
+            else if (doseStr.includes("QID")) freq = 4;
+            else if (doseStr.includes("OD")) freq = 1;
+            
+            return (amount * freq).toString();
+        }
+
+        // 监听 Deferiprone 输入并自动填入 Total Mg
+        document.getElementById('deferiproneDose').addEventListener('input', function() {
+            const calculated = autoCalculateMg(this.value);
+            if(calculated) {
+                document.getElementById('deferiproneTotalMg').value = calculated;
+            } else {
+                document.getElementById('deferiproneTotalMg').value = '';
+            }
+        });
+
+        // 监听 Deferasirox 输入并自动填入 Total Mg
+        document.getElementById('deferasiroxDose').addEventListener('input', function() {
+            const calculated = autoCalculateMg(this.value);
+            if(calculated) {
+                document.getElementById('deferasiroxTotalMg').value = calculated;
+            } else {
+                document.getElementById('deferasiroxTotalMg').value = '';
+            }
+        });
+
         function generateNote() {
-            // Section 1
             const visitDate = document.getElementById('visitDate').value;
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
             const visitNumber = document.getElementById('visitNumber').value || '-';
@@ -412,18 +451,15 @@
                 finalTransfusionText += ` (${transfusionFreq})`;
             }
 
-            // Section 2
             const ferritin = document.getElementById('ferritin').value;
             const neutrophil = document.getElementById('neutrophil').value || '-';
             const mriCardiac = document.getElementById('mriCardiac').value || '-';
             const mriLiver = document.getElementById('mriLiver').value || '-';
             
-            // Section 3 - Adjuncts
             const vitC = document.getElementById('vitC').value;
             const vitCCorrect = document.getElementById('vitCCorrect').value;
             const emla = document.getElementById('emla').value;
             
-            // Section 3 - Desferoxamine specifics
             const desferoxamine = document.getElementById('desferoxamine').value.trim();
             const desfeDays = document.getElementById('desfeDays').value;
             const desfeMissed = document.getElementById('desfeMissed').value.trim();
@@ -438,12 +474,10 @@
             const desfeSingleUse = document.getElementById('desfeSingleUse').value;
             const desfeDisposal = document.getElementById('desfeDisposal').value;
 
-            // Section 3 - Deferiprone specifics
             const deferiproneDose = document.getElementById('deferiproneDose').value.trim();
             const deferiproneTotalMg = document.getElementById('deferiproneTotalMg').value;
             const defMissed = document.getElementById('defMissed').value.trim();
 
-            // Section 3 - Deferasirox specifics
             const deferasiroxDose = document.getElementById('deferasiroxDose').value.trim();
             const deferasiroxTotalMg = document.getElementById('deferasiroxTotalMg').value;
             const defaMissed = document.getElementById('defaMissed').value.trim();
@@ -451,7 +485,6 @@
             const compliance = document.getElementById('compliance').value;
             const pillCounts = document.getElementById('pillCounts').value || '-';
 
-            // Reset UI calc displays
             const uiMeanDose = document.getElementById('uiMeanDose');
             const uiTheraIndex = document.getElementById('uiTheraIndex');
             const uiDefDailyDose = document.getElementById('uiDefDailyDose');
@@ -459,10 +492,9 @@
             
             uiMeanDose.value = "Need Weight & Dose";
             uiTheraIndex.value = "Need Ferritin value";
-            uiDefDailyDose.value = "Need Weight & Total mg";
-            uiDefaDailyDose.value = "Need Weight & Total mg";
+            uiDefDailyDose.value = "Need Weight & Dose";
+            uiDefaDailyDose.value = "Need Weight & Dose";
 
-            // Smart Chelation logic & AUTO CALCULATIONS
             let chelationDrugsText = "";
             const isUsed = (val) => val && val.toLowerCase() !== 'nil' && val.toLowerCase() !== 'n/a' && val !== '-' && val !== '0';
 
@@ -522,7 +554,7 @@
                     defCalcInfo = `\n  ↳ Daily Dose: ${defDailyMgKg.toFixed(2)} mg/kg/day`;
                     uiDefDailyDose.value = defDailyMgKg.toFixed(2);
                 } else {
-                    defCalcInfo = `\n  ↳ (Enter Weight & Total Daily mg to auto-calculate)`;
+                    defCalcInfo = `\n  ↳ (Enter Weight & Dose to auto-calculate)`;
                     uiDefDailyDose.value = "N/A";
                 }
 
@@ -544,7 +576,7 @@
                     defaCalcInfo = `\n  ↳ Daily Dose: ${defaDailyMgKg.toFixed(2)} mg/kg/day`;
                     uiDefaDailyDose.value = defaDailyMgKg.toFixed(2);
                 } else {
-                    defaCalcInfo = `\n  ↳ (Enter Weight & Total Daily mg to auto-calculate)`;
+                    defaCalcInfo = `\n  ↳ (Enter Weight & Dose to auto-calculate)`;
                     uiDefaDailyDose.value = "N/A";
                 }
 
@@ -559,16 +591,11 @@
                 chelationDrugsText = "None prescribed\n\n";
             }
 
-            // Section 4
             const adverseEvents = document.getElementById('adverseEvents').value || 'N/A';
-
-            // Section 5
             const diet = document.getElementById('diet').value;
             const splenectomy = document.getElementById('splenectomy').value;
             const physicalActivity = document.getElementById('physicalActivity').value || '-';
             const vaccines = document.getElementById('vaccines').value || '-';
-
-            // Section 6
             const otherIssues = document.getElementById('otherIssues').value || '-';
             const plan = document.getElementById('plan').value || '-';
             const tcaTmtac = document.getElementById('tcaTmtac').value || '-';
