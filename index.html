@@ -381,21 +381,18 @@
         <!-- Pharmacist Plan 多选框 -->
         <div class="form-group">
             <label>Pharmacist Plan (Select multiple)</label>
-            <div class="checkbox-group">
-                <label>
-                    <input type="checkbox" class="plan-checkbox" value="Suggest to continue all medications. To reassess medication compliance. To monitor Serum Ferritin level." checked>
-                    Suggest to continue all medications, reassess compliance, monitor Ferritin
-                </label>
-                <label>
-                    <input type="checkbox" class="plan-checkbox" value="Suggest dose adjustment for chelation therapy.">
-                    Suggest dose adjustment for chelation therapy
-                </label>
-                <label>
-                    <input type="checkbox" class="plan-checkbox" value="Suggest to withhold chelation therapy.">
-                    Suggest to withhold chelation therapy
-                </label>
+            <div class="checkbox-group" style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <label><input type="checkbox" class="plan-checkbox" value="Suggest to continue all medications." checked> Suggest to continue all medications</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To monitor Serum Ferritin level." checked> To monitor Serum Ferritin level</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To monitor MRI T2*."> To monitor MRI T2*</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To monitor Dexa Bone Scan result."> To monitor Dexa Bone Scan result</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To review diet."> To review diet</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To reassess medication compliance." checked> To reassess medication compliance</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To reassess medication knowledge."> To reassess medication knowledge</label>
+                <label><input type="checkbox" class="plan-checkbox" value="To reassess Desferal injection technique."> To reassess Desferal injection technique</label>
             </div>
         </div>
+        
         <div class="form-group">
             <label>Others, please specify:</label>
             <textarea id="otherPlan" placeholder="Type your customized or additional pharmacist plan here..."></textarea>
