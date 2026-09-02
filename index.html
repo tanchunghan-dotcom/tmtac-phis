@@ -88,6 +88,21 @@
             pointer-events: none;
         }
 
+        .checkbox-group label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-weight: normal;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
         pre {
             white-space: pre-wrap;
             font-family: monospace;
@@ -363,19 +378,27 @@
 
         <div class="section-title">6. PHARMACIST PLAN & TCA</div>
         
-        <!-- Pharmacist Plan 下拉菜单 -->
+        <!-- Pharmacist Plan 多选框 -->
         <div class="form-group">
-            <label>Pharmacist Plan</label>
-            <select id="planSelect">
-                <option value="Suggest to continue all medications. To reassess medication compliance. To monitor Serum Ferritin level.">Suggest to continue all medications, monitor Ferritin</option>
-                <option value="Suggest dose adjustment for chelation therapy. To monitor Serum Ferritin level.">Suggest dose adjustment for chelation therapy</option>
-                <option value="Suggest to withhold chelation therapy. To monitor Serum Ferritin level.">Suggest to withhold chelation therapy</option>
-                <option value="Others">Others, Please specify</option>
-            </select>
+            <label>Pharmacist Plan (Select multiple)</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" class="plan-checkbox" value="Suggest to continue all medications. To reassess medication compliance. To monitor Serum Ferritin level." checked>
+                    Suggest to continue all medications, reassess compliance, monitor Ferritin
+                </label>
+                <label>
+                    <input type="checkbox" class="plan-checkbox" value="Suggest dose adjustment for chelation therapy.">
+                    Suggest dose adjustment for chelation therapy
+                </label>
+                <label>
+                    <input type="checkbox" class="plan-checkbox" value="Suggest to withhold chelation therapy.">
+                    Suggest to withhold chelation therapy
+                </label>
+            </div>
         </div>
-        <div class="form-group" id="otherPlanDiv" style="display: none;">
-            <label>Please specify Pharmacist Plan:</label>
-            <textarea id="otherPlan" placeholder="Type your customized pharmacist plan here..."></textarea>
+        <div class="form-group">
+            <label>Others, please specify:</label>
+            <textarea id="otherPlan" placeholder="Type your customized or additional pharmacist plan here..."></textarea>
         </div>
 
         <div class="grid-2">
@@ -625,16 +648,17 @@
 
             const otherIssues = document.getElementById('otherIssues').value || '-';
             
-            // Pharmacist Plan Logic
-            let plan = document.getElementById('planSelect').value;
-            const otherPlanDiv = document.getElementById('otherPlanDiv');
-            if (plan === 'Others') {
-                otherPlanDiv.style.display = 'block';
-                const otherVal = document.getElementById('otherPlan').value.trim();
-                plan = otherVal ? otherVal : '-';
-            } else {
-                otherPlanDiv.style.display = 'none';
+            // Pharmacist Plan - Checkboxes and Custom text
+            const planCheckboxes = document.querySelectorAll('.plan-checkbox:checked');
+            let planArr = [];
+            planCheckboxes.forEach(cb => {
+                planArr.push("• " + cb.value);
+            });
+            const otherPlan = document.getElementById('otherPlan').value.trim();
+            if (otherPlan) {
+                planArr.push("• " + otherPlan);
             }
+            const finalPlan = planArr.length > 0 ? planArr.join('\n') : '-';
 
             const tcaTmtac = document.getElementById('tcaTmtac').value || '-';
             const tcaDr = document.getElementById('tcaDr').value || '-';
@@ -669,7 +693,7 @@ ${otherIssues}
 
 [ PHARMACIST ASSESSMENT & PLAN ]
 Plan: 
-${plan}
+${finalPlan}
 
 TCA TMTAC: ${tcaTmtac}
 TCA DR: ${tcaDr}`;
