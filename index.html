@@ -402,6 +402,23 @@
             <div class="form-group"><label>TCA TMTAC</label><input type="text" id="tcaTmtac" placeholder="Date/Duration"></div>
             <div class="form-group"><label>TCA DR</label><input type="text" id="tcaDr" placeholder="Date/Duration"></div>
         </div>
+
+        <!-- 药剂师签名区 -->
+        <div class="form-group" style="margin-top: 15px; border-top: 2px solid #e5e7eb; padding-top: 15px;">
+            <label>Seen By (Pharmacist Sign and Stamp):</label>
+            <select id="pharmacistSign">
+                <option value="">-- Select Pharmacist --</option>
+                <option value="Nasri">Nasri</option>
+                <option value="Michella">Michella</option>
+                <option value="Tan YS">Tan YS</option>
+                <option value="Sam">Sam</option>
+                <option value="Fizah">Fizah</option>
+                <option value="Syazwani">Syazwani</option>
+                <option value="Tan CH">Tan CH</option>
+                <option value="Atiqah">Atiqah</option>
+                <option value="Amirah">Amirah</option>
+            </select>
+        </div>
     </div>
 
     <div class="output-panel">
@@ -659,6 +676,9 @@
 
             const tcaTmtac = document.getElementById('tcaTmtac').value || '-';
             const tcaDr = document.getElementById('tcaDr').value || '-';
+            
+            // 药剂师签名
+            const pharmacistSign = document.getElementById('pharmacistSign').value;
 
             const noteText = `=== TMTAC PHARMACIST NOTES ===
 Date: ${formattedDate}
@@ -693,7 +713,9 @@ Plan:
 ${finalPlan}
 
 TCA TMTAC: ${tcaTmtac}
-TCA DR: ${tcaDr}`;
+TCA DR: ${tcaDr}
+
+Seen By (Pharmacist Sign and Stamp): ${pharmacistSign ? pharmacistSign : ''}`;
 
             noteDisplay.textContent = noteText;
         }
