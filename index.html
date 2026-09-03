@@ -372,8 +372,8 @@
         </div>
         
         <div class="form-group" style="margin-top: 15px;">
-            <label>Other Issues</label>
-            <textarea id="otherIssues" placeholder="e.g. 1) Pt well, asymptomatic. 2) Patient do not have Desferal Pump."></textarea>
+            <label>Other Issues (Press Enter for new bullet points)</label>
+            <textarea id="otherIssues" placeholder="e.g. Pt well, asymptomatic.&#10;Patient does not have Desferal Pump."></textarea>
         </div>
 
         <div class="section-title">6. PHARMACIST PLAN & TCA</div>
@@ -660,11 +660,18 @@
                 vaccineDiv.style.display = 'none';
             }
 
-            // 处理 Other Issues 的显示隐藏逻辑
+            // 处理 Other Issues (每换一行自动变成 bullet point)
             const otherIssuesValue = document.getElementById('otherIssues').value.trim();
             let otherIssuesText = "";
             if (otherIssuesValue) {
-                otherIssuesText = `\nOther Issues: \n${otherIssuesValue}\n`;
+                const issuesLines = otherIssuesValue.split('\n');
+                let formattedIssues = [];
+                issuesLines.forEach(line => {
+                    if (line.trim() !== '') {
+                        formattedIssues.push("• " + line.trim());
+                    }
+                });
+                otherIssuesText = `\nOther Issues: \n${formattedIssues.join('\n')}\n`;
             }
             
             // Pharmacist Plan - Checkboxes and Custom text
