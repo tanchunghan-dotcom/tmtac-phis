@@ -195,7 +195,7 @@
                     <select id="desfeDays">
                         <option value="5">5 days/week</option>
                         <option value="6">6 days/week</option>
-                        <option value="7">7 days/week</option>
+                        <option value="7">OD</option>
                         <option value="4">4 days/week</option>
                         <option value="3">3 days/week</option>
                         <option value="2">2 days/week</option>
@@ -394,8 +394,8 @@
         </div>
         
         <div class="form-group">
-            <label>Others, please specify:</label>
-            <textarea id="otherPlan" placeholder="Type your customized or additional pharmacist plan here..."></textarea>
+            <label>Others, please specify (Press Enter for new bullet points):</label>
+            <textarea id="otherPlan" placeholder="Type your customized pharmacist plan here..."></textarea>
         </div>
 
         <div class="grid-2">
@@ -668,16 +668,22 @@
             planCheckboxes.forEach(cb => {
                 planArr.push("• " + cb.value);
             });
+            
             const otherPlan = document.getElementById('otherPlan').value.trim();
             if (otherPlan) {
-                planArr.push("• " + otherPlan);
+                // 每换一行自动变成一个新的 bullet point
+                const lines = otherPlan.split('\n');
+                lines.forEach(line => {
+                    if (line.trim() !== '') {
+                        planArr.push("• " + line.trim());
+                    }
+                });
             }
             const finalPlan = planArr.length > 0 ? planArr.join('\n') : '-';
 
             const tcaTmtac = document.getElementById('tcaTmtac').value || '-';
             const tcaDr = document.getElementById('tcaDr').value || '-';
             
-            // 药剂师签名
             const pharmacistSign = document.getElementById('pharmacistSign').value;
 
             const noteText = `=== TMTAC PHARMACIST NOTES ===
