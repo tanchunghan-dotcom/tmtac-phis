@@ -195,7 +195,7 @@
                     <select id="desfeDays">
                         <option value="5">5 days/week</option>
                         <option value="6">6 days/week</option>
-                        <option value="7">OD</option>
+                        <option value="7">7 days/week</option>
                         <option value="4">4 days/week</option>
                         <option value="3">3 days/week</option>
                         <option value="2">2 days/week</option>
@@ -395,7 +395,7 @@
         
         <div class="form-group">
             <label>Others, please specify (Press Enter for new bullet points):</label>
-            <textarea id="otherPlan" placeholder="Type your customized pharmacist plan here..."></textarea>
+            <textarea id="otherPlan" placeholder="Type your customized or additional pharmacist plan here..."></textarea>
         </div>
 
         <div class="grid-2">
@@ -660,7 +660,12 @@
                 vaccineDiv.style.display = 'none';
             }
 
-            const otherIssues = document.getElementById('otherIssues').value || '-';
+            // 处理 Other Issues 的显示隐藏逻辑
+            const otherIssuesValue = document.getElementById('otherIssues').value.trim();
+            let otherIssuesText = "";
+            if (otherIssuesValue) {
+                otherIssuesText = `\nOther Issues: \n${otherIssuesValue}\n`;
+            }
             
             // Pharmacist Plan - Checkboxes and Custom text
             const planCheckboxes = document.querySelectorAll('.plan-checkbox:checked');
@@ -671,7 +676,6 @@
             
             const otherPlan = document.getElementById('otherPlan').value.trim();
             if (otherPlan) {
-                // 每换一行自动变成一个新的 bullet point
                 const lines = otherPlan.split('\n');
                 lines.forEach(line => {
                     if (line.trim() !== '') {
@@ -710,10 +714,7 @@ Reported Issues: ${adverseEvents}
 Low-iron diet adherence: ${diet}
 Physical Activity: ${physicalActivity}
 History of Splenectomy: ${splenectomy}${vaccinesText}
-
-Other Issues: 
-${otherIssues}
-
+${otherIssuesText}
 [ PHARMACIST PLAN & TCA ]
 Plan: 
 ${finalPlan}
