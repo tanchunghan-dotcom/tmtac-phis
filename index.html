@@ -134,6 +134,7 @@
         
         <div class="section-title">1. PATIENT INFO & DIAGNOSIS</div>
         <div class="grid-2">
+            <div class="form-group"><label>Patient Name</label><input type="text" id="patientName" placeholder="e.g. Ali bin Abu"></div>
             <div class="form-group"><label>Visit Date</label><input type="date" id="visitDate"></div>
             <div class="form-group"><label>Visit Number</label><input type="text" id="visitNumber" placeholder="e.g. 1"></div>
             <div class="form-group"><label>Weight (kg) - required for calc</label><input type="number" id="weight" placeholder="e.g. 55"></div>
@@ -372,7 +373,7 @@
         </div>
         
         <div class="form-group" style="margin-top: 15px;">
-            <label>Other Issues (Press Enter for new bullet points)</label>
+            <label>Other Issues</label>
             <textarea id="otherIssues" placeholder="e.g. Pt well, asymptomatic.&#10;Patient does not have Desferal Pump."></textarea>
         </div>
 
@@ -471,6 +472,7 @@
         });
 
         function generateNote() {
+            const patientName = document.getElementById('patientName').value.trim() || '-';
             const visitDate = document.getElementById('visitDate').value;
             const formattedDate = visitDate ? new Date(visitDate).toLocaleDateString('en-GB') : '';
             const visitNumber = document.getElementById('visitNumber').value || '-';
@@ -660,7 +662,7 @@
                 vaccineDiv.style.display = 'none';
             }
 
-            // 处理 Other Issues (每换一行自动变成 bullet point)
+            // 处理 Other Issues
             const otherIssuesValue = document.getElementById('otherIssues').value.trim();
             let otherIssuesText = "";
             if (otherIssuesValue) {
@@ -698,6 +700,7 @@
             const pharmacistSign = document.getElementById('pharmacistSign').value;
 
             const noteText = `=== TMTAC PHARMACIST NOTES ===
+Patient Name: ${patientName}
 Date: ${formattedDate}
 Visit Number: ${visitNumber}
 Weight (kg): ${weight || '-'}
